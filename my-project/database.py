@@ -15,9 +15,9 @@ def get_candidates(id=None):
 
 def get_voters():
     cursor = connection.cursor()
-    rows = cursor.execute("select id, name from voters")
+    rows = cursor.execute("select id, name, candidate_id from voters")
     rows = list(rows)
-    rows = [{'id': row[0], 'name': row[1]} for row in rows]
+    rows = [{'id': row[0], 'name': row[1], 'candidate_id':row[2]} for row in rows]
     return rows
 def get_current_user():
     return {'username': 'admin', 'role': 'admin'}
@@ -27,11 +27,11 @@ def add_candidate(name):
     cursor.execute(f"insert into candidates(name, votes) values ('{name}', 0)")
     connection.commit()
 
-def add_voter(id, name):
+def add_voter(id, name, candidate_id):
     cursor = connection.cursor()
 #error handling
     try:
-        cursor.execute(f"insert into voters(id, name) values ({id}, '{name}')")
+        cursor.execute(f"insert into voters(id, name, candidate_id) values ({id}, '{name}',{candidate_id})")
         connection.commit()
     except sqlite3.IntegrityError:
 
@@ -73,7 +73,8 @@ def set_up_database():
         pass
 
     cursor.execute("create table candidates(id integer primary key, name text, votes integer)")
-    cursor.execute("create table voters(id integer primary key, name text)")
+    #cursor.execute("create table voters(id integer primary key, name text)")
+    cursor.execute("CREATE TABLE voters (id INTEGER PRIMARY KEY, name TEXT, candidate_id INTEGER, FOREIGN KEY(candidate_id) REFERENCES candidates(id))")
 
     cursor.execute("create table users(id integer primary key, username text unique, password text, role text)")
 
@@ -81,7 +82,8 @@ def set_up_database():
         cursor.execute(f"insert into candidates (name, votes) values ('{candidate}', 0)")
 
     for voter in ['Voter 1', 'Voter 2', 'Voter 3']:
-        cursor.execute(f"insert into voters (name) values ('{voter}')")
+        
+        cursor.execute(f"insert into voters (name, candidate_id) values ('{voter}',2)")
 
     for user in [('admin', 'admin123', 'admin'), ('user1', 'pass1', 'regular'), ('user2', 'pass2', 'regular')]:
         cursor.execute(f"insert into users (username, password, role) values ('{user[0]}', '{user[1]}', '{user[2]}')")
@@ -153,5 +155,5 @@ if __name__ == "__main__":
     test_add_candidate()
     test_update_vote()
     test_get_results()
-    add_voter(123, "sai")
+    
     print("done.")

@@ -14,7 +14,7 @@
     
     <ul id="votersList">
         % for voter in voters:
-            <li>ID: {{ voter['id'] }}, Name: {{ voter['name'] }}</li>
+            <li>ID: {{ voter['id'] }}, Name: {{ voter['name'] }},Candidate ID: {{ voter['candidate_id'] }}</li>
         % end
     </ul>
 

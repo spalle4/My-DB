@@ -4,7 +4,7 @@ import database
 @route("/")
 def get_index():
     redirect("/login")
-    
+
 @route("/check_votes")
 def check_votes():
     candidates = database.get_results()
@@ -59,7 +59,7 @@ def post_vote():
     candidate_id = request.forms.get("candidate_id")
     voter_id = request.forms.get("voter_id")
     voter_name = request.forms.get("voter_name")
-    result=database.add_voter(voter_id,voter_name)
+    result=database.add_voter(voter_id,voter_name,candidate_id)
     if result is None:
         database.update_vote(candidate_id)
         redirect("/list")
